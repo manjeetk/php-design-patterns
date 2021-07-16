@@ -126,7 +126,7 @@ class Kindle implements eReaderInterface {
     public function pressButton() {
         var_dump("press the next button");
     }
-}
+    
     public function turnPage() {
         var_dump("Turn on the paper book page.");
     }
@@ -149,7 +149,7 @@ class KindleAdapter implements BookInterface {
     }
 }
 
-//A person can read book or kindle
+//A person can a read book or kindle
 class Person {
 
     public function read(BookInterface $book) {
