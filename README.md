@@ -100,4 +100,65 @@ Clients don't know whether they work with a target class directly or through an 
 
 ```php
 
+interface BookInterface {
+    public function open();
+    public function turnPage();
+} 
+
+class Book implements BookInterface {
+
+    public function open() {
+        var_dump("Open the paper book page.");
+    }
+}
+
+interface eReaderInterface {
+    public function turnOn();
+    public function pressNextButton();
+}
+
+class Kindle implements eReaderInterface {
+
+    public function turnOn() {
+        var_dump("Turn on the kindle");
+    }
+
+    public function pressButton() {
+        var_dump("press the next button");
+    }
+}
+    public function turnPage() {
+        var_dump("Turn on the paper book page.");
+    }
+}
+
+class KindleAdapter implements BookInterface {
+
+    private $kindle;
+
+    public function __construct(Kindle $kindle) {
+        $this->kindle = $kindle;
+    }
+
+    public function open() {
+        return $this->kindle->turnOn();
+    }
+
+    public function turnPage() {
+        return $this->kindle->pressNextButton();
+    }
+}
+
+//A person can read book or kindle
+class Person {
+
+    public function read(BookInterface $book) {
+        $book->read();
+        $book->turnPage();
+    } 
+}
+
+(new Person)->read(new Book());
+(new Person)->read(new kindleAdapter(new Kindle));
+
 ```
