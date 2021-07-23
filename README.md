@@ -1,7 +1,7 @@
 # Design Patterns in PHP
 The Decorator Pattern, Adapter Pattern, Template Method Pattern, Strategy Pattern, Observer Pattern
 
-## Decorator Design Pattern
+## Decorator design pattern
 
 In object-oriented programming, the decorator pattern is a design pattern that allows behavior to be added to an individual object, dynamically, without affecting the behavior of other objects from the same class. The decorator pattern is often useful for adhering to the Single Responsibility Principle, as it allows functionality to be divided between classes with unique areas of concern. Decorator use can be more efficient than subclassing, because an object's behavior can be augmented without defining an entirely new object.
 
@@ -73,7 +73,7 @@ $wholePackagePrice = (new SEO(new CustomDesign(new BasicDesign())))->getCost();
 var_dump("Price for all services: ". $wholePackagePrice);
 
 ```
-## Adapter Design Pattern
+## Adapter design pattern
 
 The adapter pattern is a software design pattern (also known as wrapper, an alternative naming shared with the decorator pattern) that allows the interface of an existing class to be used as another interface. It is often used to make existing classes work with others without modifying their source code.
 
@@ -161,7 +161,7 @@ class Person {
 
 ```
 
-## Template Method Pattern
+## Template method pattern
 
 The template method is a method in a superclass, usually an abstract superclass, and defines the skeleton of an operation in terms of a number of high-level steps. These steps are themselves implemented by additional helper methods in the same class as the template method.
 
@@ -289,3 +289,84 @@ $app->log("Log", new LogToWebService);
 
 ```
 
+## Chain-of-responsibility pattern
+
+The chain-of-responsibility pattern is a behavioral design pattern consisting of a source of command objects and a series of processing objects. Each processing object contains logic that defines the types of command objects that it can handle; the rest are passed to the next processing object in the chain. A mechanism also exists for adding new processing objects to the end of this chain.
+
+In a variation of the standard chain-of-responsibility model, some handlers may act as dispatchers, capable of sending commands out in a variety of directions, forming a tree of responsibility. In some cases, this can occur recursively, with processing objects calling higher-up processing objects with commands that attempt to solve some smaller part of the problem; in this case recursion continues until the command is processed, or the entire tree has been explored. An XML interpreter might work in this manner.
+
+This pattern promotes the idea of loose coupling.
+
+*What problems can the Chain of Responsibility design pattern solve?*
+
+- Coupling the sender of a request to its receiver should be avoided.
+- It should be possible that more than one receiver can handle a request.
+
+Implementing a request directly within the class that sends the request is inflexible because it couples the class to a particular receiver and makes it impossible to support multiple receivers
+
+*What solution does the Chain of Responsibility design pattern describe?*
+
+- Define a chain of receiver objects having the responsibility, depending on run-time conditions, to either handle a request or forward it to the next receiver on the chain (if any).
+
+This enables us to send a request to a chain of receivers without having to know which one handles the request. The request gets passed along the chain until a receiver handles the request. The sender of a request is no longer coupled to a particular receiver.
+
+```php
+
+abstract class HomeChecker {
+    protected $successor;
+    public abstract function check(HomeStatus $home);
+
+    public function succeedWith(HomeChecker $successor) {
+        $this->successor = $successor;
+    }
+
+    public function next(HomeStatus $home) {
+        if(!this->successor) {
+            $this->successor = check($home);
+        }
+    }
+}
+
+class Locks extends HomeChecker {
+    public function check(HomeStatus $home){
+        if(!home->locked) {
+            throw new Exception("The doors are not locked!");
+        }
+        $this->next($home);
+    }
+}
+
+class Lights extends HomeChecker {
+    public function check(HomeStatus $home){
+        if(!home->lightsOff) {
+            throw new Exception("The lights are on!");
+        }
+        $this->next($home);
+    }
+}
+
+class Alarm extends HomeChecker {
+    public function check(HomeStatus $home){
+        if(!home->alarmOn) {
+            throw new Exception("The alarm is not on!");
+        }
+        $this->next($home);
+    }
+}
+
+class HomeStatus {
+    public $alarmOn = false;
+    public $locked = true;
+    public $lightsOff = false;
+}
+
+$locks = new Locks;
+$lights = new Lights;
+$alarm = new Alarm;
+
+$locks->succeedWith($lights);
+$lights->succeedWith($alarm);
+
+$locks->check(new HomeStatus);
+
+```
