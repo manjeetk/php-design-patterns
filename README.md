@@ -60,19 +60,17 @@ class SEO implements WebsiteDesign {
     }
 }
 
-
 $basicPrice = (new BasicDesign())->getCost();
-print_r("Basic Website Design Price: ". $basicPrice . "\n");
+var_dump("Basic Website Design Price: ". $basicPrice . "\n");
 
 $customPrice = (new customDesign(new BasicDesign()))->getCost();
-print_r("Custom and Basic Website Design Price: ". $customPrice . "\n");
+var_dump("Custom and Basic Website Design Price: ". $customPrice . "\n");
 
 $seoPrice = (new SEO(new BasicDesign()))->getCost();
-print_r("SEO and Basic Website Design Price: ". $seoPrice . "\n");
+var_dump("SEO and Basic Website Design Price: ". $seoPrice . "\n");
 
 $wholePackagePrice = (new SEO(new CustomDesign(new BasicDesign())))->getCost();
-print_r("Price for all services: ". $wholePackagePrice);
-
+var_dump("Price for all services: ". $wholePackagePrice);
 
 ```
 ## Adapter Design Pattern
@@ -126,7 +124,7 @@ class Kindle implements eReaderInterface {
     public function pressButton() {
         var_dump("press the next button");
     }
-    
+
     public function turnPage() {
         var_dump("Turn on the paper book page.");
     }
@@ -162,3 +160,132 @@ class Person {
 (new Person)->read(new kindleAdapter(new Kindle));
 
 ```
+
+## Template Method Pattern
+
+The template method is a method in a superclass, usually an abstract superclass, and defines the skeleton of an operation in terms of a number of high-level steps. These steps are themselves implemented by additional helper methods in the same class as the template method.
+
+The helper methods may be either abstract methods, in which case subclasses are required to provide concrete implementations, or hook methods, which have empty bodies in the superclass. Subclasses can (but are not required to) customize the operation by overriding the hook methods. The intent of the template method is to define the overall structure of the operation, while allowing subclasses to refine, or redefine, certain steps.
+
+*This pattern has two main parts:*
+
+The "template method" is implemented as a method in a base class (usually an abstract class). This method contains code for the parts of the overall algorithm that are invariant. The template ensures that the overarching algorithm is always followed. In the template method, portions of the algorithm that may vary are implemented by sending self messages that request the execution of additional helper methods. In the base class, these helper methods are given a default implementation, or none at all (that is, they may be abstract methods).
+
+Subclasses of the base class "fill in" the empty or "variant" parts of the "template" with specific algorithms that vary from one subclass to another. It is important that subclasses do not override the template method itself.
+
+*The template method is used for the following reasons.*
+
+- It lets subclasses implement varying behavior (through overriding of the hook methods).
+It avoids duplication in the code: the general workflow of the algorithm is implemented once in the abstract class's template method, and necessary variations are implemented in the subclasses.
+- It controls the point(s) at which specialization is permitted. If the subclasses were to simply override the template method, they could make radical and arbitrary changes to the workflow. In contrast, by overriding only the hook methods, only certain specific details of the workflow can be changed, and the overall workflow is left intact.
+
+```php
+abstract class Game
+{
+    abstract protected function initialize();
+    abstract protected function startPlay();
+    abstract protected function endPlay();
+
+    public final function play()
+    {
+        $this->initialize();
+        $this->startPlay();
+        $this->endPlay();
+    }
+}
+
+class Mario extends Game
+{
+    protected function initialize()
+    {
+        var_dump("Mario Game Initialized! Start playing.");
+    }
+
+    protected function startPlay()
+    {
+        var_dump("Mario Game Started. Enjoy the game!");
+    }
+
+    protected function endPlay()
+    {
+        var_dump("Mario Game Finished!");
+    }
+
+}
+
+class Tankfight extends Game
+{
+    protected function initialize()
+    {
+        var_dump("Tankfight Game Initialized! Start playing.");
+    }
+
+    protected function startPlay()
+    {
+        var_dump("Tankfight Game Started. Enjoy the game!");
+    }
+
+    protected function endPlay()
+    {
+        var_dump("Tankfight Game Finished!");
+    }
+
+}
+
+$game = new Tankfight();
+$game->play();
+
+$game = new Mario();
+$game->play();
+
+```
+
+## Strategy pattern
+
+The strategy pattern (also known as the policy pattern) is a behavioral software design pattern that enables selecting an algorithm at runtime. Instead of implementing a single algorithm directly, code receives run-time instructions as to which in a family of algorithms to use.
+
+Strategy lets the algorithm vary independently from clients that use it. Strategy is one of the patterns included in the influential book Design Patterns by Gamma et al. that popularized the concept of using design patterns to describe how to design flexible and reusable object-oriented software. Deferring the decision about which algorithm to use until runtime allows the calling code to be more flexible and reusable.
+
+For instance, a class that performs validation on incoming data may use the strategy pattern to select a validation algorithm depending on the type of data, the source of the data, user choice, or other discriminating factors. These factors are not known until run-time and may require radically different validation to be performed. The validation algorithms (strategies), encapsulated separately from the validating object, may be used by other validating objects in different areas of the system (or even different systems) without code duplication.
+
+Typically, the strategy pattern stores a reference to some code in a data structure and retrieves it. This can be achieved by mechanisms such as the native function pointer, the first-class function, classes or class instances in object-oriented programming languages, or accessing the language implementation's internal storage of code via reflection.
+
+```php
+
+interface Logger {
+    public function log($data);
+}
+
+class LogToFile implements Logger {
+
+    public function log($data) {
+        var_dump("Log the data to the File");
+    }
+}
+
+class LogToDatabase implements Logger {    
+   public function log($data) {
+        var_dump("Log the data to the DB");
+    }    
+}
+
+class LogToWebService implements Logger {
+    public function log($data) {
+        var_dump("Log the data to the Web Service");
+    }
+}
+
+class App {
+    public function log($data, Logger $logger) {    
+        $logger = $logger ?: new LogToFile;
+        $logger->log($data);
+    }
+}
+
+$app = new App();
+$app->log("Log", new LogToFile);
+$app->log("Log", new LogToDatabase);
+$app->log("Log", new LogToWebService);
+
+```
+

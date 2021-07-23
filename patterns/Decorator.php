@@ -38,15 +38,15 @@ class SEO implements WebsiteDesign {
 
 
 $basicPrice = (new BasicDesign())->getCost();
-print_r("Basic Website Design Price: ". $basicPrice . "\n");
+var_dump("Basic Website Design Price: ". $basicPrice . "\n");
 
 $customPrice = (new customDesign(new BasicDesign()))->getCost();
-print_r("Custom and Basic Website Design Price: ". $customPrice . "\n");
+var_dump("Custom and Basic Website Design Price: ". $customPrice . "\n");
 
 $seoPrice = (new SEO(new BasicDesign()))->getCost();
-print_r("SEO and Basic Website Design Price: ". $seoPrice . "\n");
+var_dump("SEO and Basic Website Design Price: ". $seoPrice . "\n");
 
 $wholePackagePrice = (new SEO(new CustomDesign(new BasicDesign())))->getCost();
-print_r("Price for all services: ". $wholePackagePrice);
+var_dump("Price for all services: ". $wholePackagePrice);
 
 ?>
