@@ -370,3 +370,103 @@ $lights->succeedWith($alarm);
 $locks->check(new HomeStatus);
 
 ```
+## Observer pattern
+The observer pattern is a software design pattern in which an object, named the subject, maintains a list of its dependents, called observers, and notifies them automatically of any state changes, usually by calling one of their methods.
+
+It is mainly used for implementing distributed event handling systems, in "event driven" software. In those systems, the subject is usually named a "stream of events" or "stream source of events", while the observers are called "sinks of events". The stream nomenclature alludes to a physical setup where the observers are physically separated and have no control over the emitted events from the subject/stream-source. 
+
+*What problems can the Observer design pattern solve?*
+The Observer pattern addresses the following problems:
+- A one-to-many dependency between objects should be defined without making the objects tightly coupled.
+- It should be ensured that when one object changes state, an open-ended number of dependent objects are updated automatically.
+
+*What solution does the Observer design pattern describe?*
+- Define Subject and Observer objects.
+- so that when a subject changes state, all registered observers are notified and updated automatically (and probably asynchronously).
+
+The sole responsibility of a subject is to maintain a list of observers and to notify them of state changes by calling their update() operation. The responsibility of observers is to register (and unregister) themselves on a subject (to get notified of state changes) and to update their state (synchronize their state with the subject's state) when they are notified. This makes subject and observers loosely coupled. Subject and observers have no explicit knowledge of each other. Observers can be added and removed independently at run-time. This notification-registration interaction is also known as publish-subscribe.
+
+```php
+
+interface Subject {
+    public function attach($observable);
+    public function detach($index);
+    public function notify();
+}
+
+interface Observer {
+    public function handle();
+}
+
+class Login implements Subject {
+
+    protected $observers = [];
+
+    public function attach($observable) {
+        if(is_array($observable)) {
+            return $this->attachObservers($observable);
+        }
+        $this->observers[] = $observable;
+        return $this;
+    }
+
+    public function detach($index) {
+        unset($this->observer[$index]);
+    }
+
+    public function notify() {
+        foreach($this->observers as $observer) {
+            $observer->handle();
+        }
+    }
+
+    private function attachObservers($observable) {
+        foreach($observable as $observer) {
+            if(!$observer instanceof Observer) {
+                throw new Exception;
+            }
+            $this->attach($observer);
+        }    
+    }
+    
+    public function fire() {
+        $this->notify();
+    }
+}
+
+
+class LoginHandler implements Observer {
+
+    public function handle() {
+        var_dump('Logged in!!');
+    }
+
+}
+
+class EmailHandler implements Observer {
+
+    public function handle() {
+        var_dump('Email sent!!');
+    }
+    
+}
+
+class RepoerHandler implements Observer {
+
+    public function handle() {
+        var_dump('Report generated!!');
+    }
+    
+}
+
+$login = new Login;
+$login->attach([
+    new LoginHandler,
+    new EmailHandler,
+    new RepoerHandler
+]);
+
+$login->fire();
+
+```
+
